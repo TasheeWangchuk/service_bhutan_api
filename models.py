@@ -151,6 +151,13 @@ class Experiences(models.Model):
         managed = False
         db_table = 'experiences'
 
+class Skills(models.Model):
+    skill_id = models.AutoField(primary_key=True)
+    name = models.CharField(unique=True, max_length=255)
+
+    class Meta:
+        managed = False
+        db_table = 'skills'
 
 class JobSkills(models.Model):
     job = models.OneToOneField('Jobs', models.DO_NOTHING, primary_key=True)  # The composite primary key (job_id, skill_id) found, that is not supported. The first column is selected.
@@ -255,13 +262,7 @@ class Reviews(models.Model):
         db_table = 'reviews'
 
 
-class Skills(models.Model):
-    skill_id = models.AutoField(primary_key=True)
-    name = models.CharField(unique=True, max_length=255)
 
-    class Meta:
-        managed = False
-        db_table = 'skills'
 
 
 class Users(models.Model):
