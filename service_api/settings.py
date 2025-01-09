@@ -48,11 +48,11 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'user',
-    'job',
+    # 'job',
     'rest_framework.authtoken',
-    'notification',
+    # 'notification',
     'portfolio',
-    'contract',
+    # 'contract',
     'corsheaders',
 ]
 
