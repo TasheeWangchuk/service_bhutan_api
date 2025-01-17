@@ -108,7 +108,8 @@ database_url = os.environ.get('DATABASE_URL')
 
 # """External Database Connection"""
 # database_url ="postgresql://service_bhutan_database_user:4Ne9ssjoZBZGH9fUwgjRzT9GOk8gZwAt@dpg-ctv44kl6l47c739s49og-a.oregon-postgres.render.com/service_bhutan_database"
-# DATABASES["default"] = dj_database_url.parse(database_url)
+
+DATABASES["default"] = dj_database_url.parse(database_url)
 
 
 # Password validation
