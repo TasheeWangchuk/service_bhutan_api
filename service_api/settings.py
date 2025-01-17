@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'django_filters',
     'user',
     # 'job',
     'rest_framework.authtoken',
@@ -54,6 +55,7 @@ INSTALLED_APPS = [
     'portfolio',
     # 'contract',
     'corsheaders',
+    'rest_framework_simplejwt.token_blacklist',
 ]
 
 MIDDLEWARE = [
@@ -102,11 +104,11 @@ DATABASES = {
 }
 
 # """Render database_url variable"""
-database_url = os.environ.get('DATABASE_URL')
+# database_url = os.environ.get('DATABASE_URL')
 
 # """External Database Connection"""
 # database_url ="postgresql://service_bhutan_database_user:4Ne9ssjoZBZGH9fUwgjRzT9GOk8gZwAt@dpg-ctv44kl6l47c739s49og-a.oregon-postgres.render.com/service_bhutan_database"
-DATABASES["default"] = dj_database_url.parse(database_url)
+# DATABASES["default"] = dj_database_url.parse(database_url)
 
 
 # Password validation
@@ -162,6 +164,7 @@ REST_FRAMEWORK = {
         "rest_framework.authentication.TokenAuthentication",
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ],
+    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend']
 }
 
 SIMPLE_JWT = {
@@ -188,7 +191,4 @@ EMAIL_HOST_PASSWORD = 'fjsa ypeg roeb acce'      # Replace with your Gmail passw
 # settings.py
 # EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000", 
-    # Your frontend URL
-]
+CORS_ALLOW_ALL_ORIGINS = True
