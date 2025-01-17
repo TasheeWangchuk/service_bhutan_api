@@ -47,7 +47,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-    # 'django_filters',
+    'django_filters',
     'user',
     # 'job',
     'rest_framework.authtoken',
@@ -104,7 +104,7 @@ DATABASES = {
 }
 
 # """Render database_url variable"""
-# database_url = os.environ.get('DATABASE_URL')
+database_url = os.environ.get('DATABASE_URL')
 
 # """External Database Connection"""
 # database_url ="postgresql://service_bhutan_database_user:4Ne9ssjoZBZGH9fUwgjRzT9GOk8gZwAt@dpg-ctv44kl6l47c739s49og-a.oregon-postgres.render.com/service_bhutan_database"
