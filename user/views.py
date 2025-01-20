@@ -2,13 +2,13 @@ from rest_framework import status, generics
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated, AllowAny
+from .permissions import IsClient, IsFreelancer, IsAdministrator
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import authenticate
 from .serializer import (UserRegistrationSerializer, UserLoginSerializer, 
                         ProfileSerializer, UserProfileSerializer, EmailVerificationSerializer)
 from rest_framework import response,status
 from rest_framework_simplejwt.tokens import RefreshToken
-
 from rest_framework.generics import ListAPIView, GenericAPIView
 from . import models
 from django.contrib.sites.shortcuts import get_current_site
@@ -16,9 +16,6 @@ from django.urls import reverse
 from .utils import Util
 from django.conf import settings
 import jwt
-
-
-
 
 class SignUp(GenericAPIView):
     serializer_class = UserRegistrationSerializer
@@ -99,8 +96,25 @@ class LoginView(APIView):
             'tokens': {
                 'refresh': str(refresh),
                 'access': str(refresh.access_token)
+            },
+            'user': {
+                'email': user.email,
+                'role': user.role,
+                'username': user.username
             }
         })
+
+class LogoutView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        try:
+            refresh_token = request.data["refresh_token"]
+            token = RefreshToken(refresh_token)
+            token.blacklist()
+            return Response({"message": "Successfully logged out"}, status=status.HTTP_200_OK)
+        except Exception:
+            return Response({"error": "Invalid token"}, status=status.HTTP_400_BAD_REQUEST)
 
 class ProfileView(generics.RetrieveUpdateAPIView):
     permission_classes = [IsAuthenticated]

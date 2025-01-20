@@ -128,7 +128,7 @@ class UserLoginSerializer(serializers.Serializer):
 class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = Profile
-        fields = ('profile_id', 'profile_picture', 'banner', 'bio', 'address')
+        fields = ('profile_id', 'profile_picture', 'banner', 'bio', 'address','headline')
 
 class UserProfileSerializer(serializers.ModelSerializer):
     profile = ProfileSerializer()
@@ -136,5 +136,12 @@ class UserProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
         fields = ('user_id', 'username', 'email', 'first_name', 'last_name', 
-                 'phone', 'role', 'profile')
+                 'phone', 'role', 'profile','address',)
         read_only_fields = ('user_id', 'email', 'role')
+
+class UserMinimalSerializer(serializers.ModelSerializer):
+    profile_picture = serializers.CharField(source='profile.profile_picture', read_only=True)
+    headline = serializers.CharField(source='profile.headline', read_only=True)
+    class Meta:
+        model = CustomUser
+        fields = ('user_id','username', 'address','profile_picture','headline')
