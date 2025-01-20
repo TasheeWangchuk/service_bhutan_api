@@ -41,6 +41,7 @@ class CustomUser(AbstractUser):
     cid = models.CharField(max_length=150,unique=True,null=True)
     phone = models.CharField(max_length=15, blank=True, null=True)
     terms_check = models.BooleanField(default=False)
+    address = models.CharField(max_length=150,null = True)
     role = models.CharField(max_length=50, choices=[
         ('Client', 'Client'),
         ('Freelancer', 'Freelancer'),
@@ -72,6 +73,7 @@ class CustomUser(AbstractUser):
 class Profile(models.Model):
     profile_id = models.AutoField(primary_key=True)  # auto-increment primary key
     user= models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name='profile')  # links to the user model
+    headline = models.TextField(blank=True, null=True,max_length=50)
     profile_picture = models.URLField(max_length=200, blank=True, null=True)  # URL to the user's profile picture
     banner = models.URLField(max_length=200, blank=True, null=True)  # URL to the user's banner image
     bio = models.TextField(blank=True, null=True)  # Short biography
