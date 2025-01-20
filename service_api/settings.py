@@ -24,6 +24,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
 
+# LocalHost
+
 # SECRET_KEY = 'django-insecure-@8*)2cpm!w=z$0pi$#+9*&!@1i82-orc=g#(q3*)0iy&rkmuqa'
 
 # # SECURITY WARNING: don't run with debug turned on in production!
@@ -31,6 +33,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # ALLOWED_HOSTS = []
 
+# render
 SECRET_KEY = os.environ.get('SECRET_KEY')
 
 DEBUG = os.environ.get('DEBUG', 'False') == 'True'
@@ -52,13 +55,51 @@ INSTALLED_APPS = [
     # 'job',
     'rest_framework.authtoken',
     # 'notification',
-    'portfolio',
+    # 'portfolio',
     # 'contract',
     'corsheaders',
     'rest_framework_simplejwt.token_blacklist',
 ]
 
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000", 
+    "http://localhost:3001"# Your Next.js development server
+    # Add your production frontend URL when deploying
+]
+
+CORS_ALLOW_CREDENTIALS = True
+
+CORS_ALLOW_METHODS = [
+    'DELETE',
+    'GET',
+    'OPTIONS',
+    'PATCH',
+    'POST',
+    'PUT',
+]
+
+CORS_ALLOW_HEADERS = [
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+]
+
+# Since you're using JWT, add these settings
+CSRF_COOKIE_SECURE = True
+CSRF_COOKIE_SAMESITE = 'None'
+SESSION_COOKIE_SECURE = True
+SESSION_COOKIE_SAMESITE = 'None'
+
+
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',  # Move this to the top
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -66,7 +107,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
 ]
 
 ROOT_URLCONF = 'service_api.urls'
@@ -191,5 +231,3 @@ EMAIL_HOST_PASSWORD = 'fjsa ypeg roeb acce'      # Replace with your Gmail passw
 
 # settings.py
 # EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-
-CORS_ALLOW_ALL_ORIGINS = True
