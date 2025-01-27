@@ -6,21 +6,38 @@ from django.contrib.auth.models import BaseUserManager
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.dispatch import receiver
 from django.db.models.signals import post_save
-
+from drf_writable_nested.serializers import WritableNestedModelSerializer
+from .enum import Role
 
 class UserManager(BaseUserManager):
-    def create_user(self, email,password,**extra_fields):
+    # def create_user(self, email,password,**extra_fields):
+    #     if not email:
+    #         raise ValueError('Users must have an email address')
+    #     if not password:
+    #         raise ValueError('Users must have a password')
+        
+    #     email = self.normalize_email(email)
+    #     user = self.model(
+    #         email=email,
+    #         **extra_fields
+    #     )
+    #     user.set_password(password)
+    #     user.save(using=self._db)
+    #     return user
+    
+    def create_user(self, email, password=None, **extra_fields):
         if not email:
             raise ValueError('Users must have an email address')
-        if not password:
-            raise ValueError('Users must have a password')
         
         email = self.normalize_email(email)
-        user = self.model(
-            email=email,
-            **extra_fields
-        )
-        user.set_password(password)
+        user = self.model(email=email, **extra_fields)
+        
+        if password:
+            user.set_password(password)
+        else:
+            # For admin-created users without initial password
+            user.set_unusable_password()
+            
         user.save(using=self._db)
         return user
     
@@ -41,11 +58,11 @@ class CustomUser(AbstractUser):
     cid = models.CharField(max_length=150,unique=True,null=True)
     phone = models.CharField(max_length=15, blank=True, null=True)
     terms_check = models.BooleanField(default=False)
-    address = models.CharField(max_length=150,null = True)
-    role = models.CharField(max_length=50, choices=[
-        ('Client', 'Client'),
-        ('Freelancer', 'Freelancer'),
-        ('Administrator', 'Administrator')], default='Client')
+    role = models.CharField(
+        max_length=50, 
+        choices=Role.choices, 
+        default=Role.CLIENT
+    )
     is_banned = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -74,8 +91,8 @@ class Profile(models.Model):
     profile_id = models.AutoField(primary_key=True)  # auto-increment primary key
     user= models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name='profile')  # links to the user model
     headline = models.TextField(blank=True, null=True,max_length=50)
-    profile_picture = models.URLField(max_length=200, blank=True, null=True)  # URL to the user's profile picture
-    banner = models.URLField(max_length=200, blank=True, null=True)  # URL to the user's banner image
+    profile_picture = models.ImageField(upload_to='profile_pictures/', null=True, blank=True)
+    banner = models.ImageField(upload_to='banner/', null=True, blank=True)
     bio = models.TextField(blank=True, null=True)  # Short biography
     address = models.CharField(max_length=255, blank=True, null=True)  # User's address
     created_at = models.DateTimeField(auto_now_add=True)  # Timestamp when the profile is created
@@ -97,3 +114,11 @@ def save_user_profile(sender, instance, **kwargs):
     if not hasattr(instance, 'profile'):
         Profile.objects.create(user=instance)
     instance.profile.save()
+
+class PasswordReset(models.Model):
+    email = models.EmailField()
+    token = models.CharField(max_length=100)
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        db_table = 'password_resets'

@@ -42,9 +42,6 @@ class CertificateSerializer(serializers.ModelSerializer):
         return value
         
 class EducationSerializer(serializers.ModelSerializer):
-    """
-    Serializer for Education model with date range validation.
-    """
     class Meta:
         model = Education
         fields = [
