@@ -243,7 +243,7 @@ class UserListView(generics.ListAPIView):
             is_verified=True,
             is_banned=False,
             deleted_at__isnull=True,
-            role__in=['freelancer', 'client']  # Include only Freelancer and Client roles
+            role__in=['Freelancer', 'Client']  # Include only Freelancer and Client roles
         )
 
 class UserDetailView(generics.RetrieveAPIView):
