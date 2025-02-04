@@ -244,7 +244,7 @@ class UserListView(generics.ListAPIView):
             is_banned=False,
             deleted_at__isnull=True,
             role__in=['Freelancer', 'Client']  # Include only Freelancer and Client roles
-        )
+        ).exclude(user_id= self.request.user.user_id)
 
 class UserDetailView(generics.RetrieveAPIView):
     queryset = CustomUser.objects.all()
