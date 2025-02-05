@@ -64,7 +64,6 @@ def send_verification_email(user_id,username,email,verification_url):
         logger.error(f"Error in verification email: {e}")
         raise
     
-    
 @app.task
 def send_admin_created_email(user_id, email, verification_url):
     try:
