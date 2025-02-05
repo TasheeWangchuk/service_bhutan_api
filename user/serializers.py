@@ -226,10 +226,10 @@ class ProfilePhotoSerializer(serializers.ModelSerializer):
 class UserMinimalSerializer(serializers.ModelSerializer):
     profile_picture = serializers.CharField(source='profile.profile_picture', read_only=True)
     headline = serializers.CharField(source='profile.headline', read_only=True)
+    address = serializers.CharField(source='profile.address', read_only=True)
     class Meta:
         model = CustomUser
         fields = ('user_id','username', 'address','profile_picture','headline')
-
 
 class UserBanSerializer(serializers.ModelSerializer):
     class Meta:
