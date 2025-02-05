@@ -8,6 +8,11 @@ from dotenv import load_dotenv
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+import os
+from google.oauth2 import service_account
+
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
 
 # Media
 MEDIA_URL = '/media/'
@@ -37,9 +42,9 @@ INSTALLED_APPS = [
     'rest_framework',
     'django_filters',
     'user',
-    # 'job',
+    'job',
     'rest_framework.authtoken',
-    # 'notification',
+    'notification',
     'portfolio',
     # 'contract',
     'corsheaders',
@@ -129,10 +134,10 @@ DATABASES = {
 }
 
 # """Render database_url variable"""
-database_url = os.environ.get('DATABASE_URL')
+# database_url = os.environ.get('DATABASE_URL')
 
 # """External Database Connection"""
-# database_url ="postgresql://service_bhutan_database_user:4Ne9ssjoZBZGH9fUwgjRzT9GOk8gZwAt@dpg-ctv44kl6l47c739s49og-a.oregon-postgres.render.com/service_bhutan_database"
+database_url ="postgresql://service_bhutan_database_user:4Ne9ssjoZBZGH9fUwgjRzT9GOk8gZwAt@dpg-ctv44kl6l47c739s49og-a.oregon-postgres.render.com/service_bhutan_database"
 
 DATABASES["default"] = dj_database_url.parse(database_url)
 
