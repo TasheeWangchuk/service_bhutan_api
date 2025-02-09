@@ -17,7 +17,6 @@ urlpatterns = [
     path('users/login/', LoginView.as_view(), name='login'),
     path('users/logout/', LogoutView.as_view(), name='logout'),
     path('users/profile/', ProfileView.as_view(), name='profile'),
-     path('users/token/refresh/', TokenRefreshView.as_view(), name='token-refresh'),
     path('users/upload_profile_picture/',UserPhotoUploadView.as_view(), name='upload-profile-picture'),
     path('users/upload_banner/',UserBannerUploadView.as_view(), name='upload-banner-picture'),
     path('users/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
