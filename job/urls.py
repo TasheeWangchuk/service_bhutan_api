@@ -21,4 +21,5 @@ urlpatterns = [
     path('jobs/<int:job_id>/proposals/', ProposalListCreateView.as_view(), name='job-proposals-list-create'),
     path('jobs/<int:job_id>/proposals/<int:proposal_id>/', ProposalDetailView.as_view(), name='job-proposal-detail'),
     path('proposals/my-proposals/', UserProposalListView.as_view(), name='user-proposals-list'),
+    
 ]

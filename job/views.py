@@ -24,7 +24,6 @@ from .helper.notify import (
     notify_job_deletion
 )
 
-
 class JobListCreateView(generics.ListCreateAPIView):
     permission_classes = [IsAuthenticated]
     
@@ -162,7 +161,7 @@ class ProposalDetailView(generics.RetrieveUpdateDestroyAPIView):
         
     def perform_destroy(self, instance):
         # Only allow deletion if proposal is pending
-        if instance.status != 'pending':
+        if instance.status != 'PENDING':
             raise ValidationError(
                 "Cannot delete proposal that is not in pending status"
             )
