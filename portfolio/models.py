@@ -32,7 +32,7 @@ class Certificate(models.Model):
 
 class Education(models.Model):
     education_id = models.AutoField(primary_key=True)
-    profile = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='educations')
+    profile = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='education')
     country = models.CharField(max_length=255, blank=True, null=True)
     university = models.CharField(max_length=255, blank=True, null=True)
     degree = models.CharField(max_length=255, blank=True, null=True)
@@ -57,6 +57,8 @@ class Experience(models.Model):
     start_date = models.DateField(blank=True, null=True)
     end_date = models.DateField(blank=True, null=True)
     work_description = models.TextField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         managed = False

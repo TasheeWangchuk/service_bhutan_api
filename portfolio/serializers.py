@@ -8,14 +8,14 @@ class PortfolioSerializer(serializers.ModelSerializer):
         model = Portfolio
         fields = [
             'portfolio_id',
-            'profile',
             'project_title',
+            'profile',
             'project_role',
             'project_description',
             'created_at',
             'updated_at'
         ]
-        read_only_fields = ['portfolio_id','created_at', 'updated_at']
+        read_only_fields = ['profile','portfolio_id','created_at', 'updated_at']
         
         def validate_project_title(self, value):
             if len(value.strip()) == 0:
@@ -35,7 +35,7 @@ class CertificateSerializer(serializers.ModelSerializer):
             'created_at',
             'updated_at'
         ]
-        read_only_fields = ['certificate_id', 'created_at', 'updated_at']      
+        read_only_fields = [ 'profile','certificate_id', 'created_at', 'updated_at']      
     def validate_issue_date(self, value):
         if value and value > timezone.now().date():
             raise serializers.ValidationError("Issue date cannot be in the future")
@@ -51,9 +51,11 @@ class EducationSerializer(serializers.ModelSerializer):
             'university',
             'degree',
             'start_year',
-            'end_year'
+            'end_year',
+            'created_at',
+            'updated_at'
         ]
-        read_only_fields = ['education_id']
+        read_only_fields = [ 'profile','education_id','created_at','updated_at']
 
     def validate(self, data):
         if data.get('start_year') and data.get('end_year'):
@@ -81,9 +83,10 @@ class ExperienceSerializer(serializers.ModelSerializer):
             'start_date',
             'end_date',
             'work_description',
-            'duration'
+            'created_at',
+            'updated_at'
         ]
-        read_only_fields = ['experience_id']
+        read_only_fields = ['profile','experience_id','created_at','updated_at']
 
     def get_duration(self, obj):
         """Calculate the duration of experience"""
