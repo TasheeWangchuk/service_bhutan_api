@@ -21,14 +21,14 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # LocalHost
 
-# SECRET_KEY = 'django-insecure-@8*)2cpm!w=z$0pi$#+9*&!@1i82-orc=g#(q3*)0iy&rkmuqa'
-# DEBUG = True
-# ALLOWED_HOSTS = []
+SECRET_KEY = 'django-insecure-@8*)2cpm!w=z$0pi$#+9*&!@1i82-orc=g#(q3*)0iy&rkmuqa'
+DEBUG = True
+ALLOWED_HOSTS = []
 
 # render
-SECRET_KEY = os.environ.get('SECRET_KEY')
-DEBUG = os.environ.get('DEBUG', 'False') == 'True'
-ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS").split(",")
+# SECRET_KEY = os.environ.get('SECRET_KEY')
+# DEBUG = os.environ.get('DEBUG', 'False') == 'True'
+# ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS").split(",")
 
 # Application definition
 
@@ -137,7 +137,7 @@ DATABASES = {
 database_url = os.environ.get('DATABASE_URL')
 
 # """External Database Connection"""
-# database_url ="postgresql://service_bhutan_database_user:4Ne9ssjoZBZGH9fUwgjRzT9GOk8gZwAt@dpg-ctv44kl6l47c739s49og-a.oregon-postgres.render.com/service_bhutan_database"
+# database_url ="postgresql://service_bhutan_database_u452_user:EMW9XFgDmJtzNBSihyn4LULhWqpMJT1k@dpg-cukettt6l47c73cas0i0-a.oregon-postgres.render.com/service_bhutan_database_u452"
 
 DATABASES["default"] = dj_database_url.parse(database_url)
 
@@ -200,8 +200,8 @@ REST_FRAMEWORK = {
 
 SIMPLE_JWT = {
     'AUTH_HEADER_TYPES': ('Bearer',),
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+    'ACCESS_TOKEN_LIFETIME': timedelta(hours=2),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
     'ROTATE_REFRESH_TOKENS': False,
     'BLACKLIST_AFTER_ROTATION': True,
     'USER_ID_FIELD': 'user_id',  # Add this line
