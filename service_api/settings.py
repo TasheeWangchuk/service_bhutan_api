@@ -21,14 +21,14 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # LocalHost
 
-SECRET_KEY = 'django-insecure-@8*)2cpm!w=z$0pi$#+9*&!@1i82-orc=g#(q3*)0iy&rkmuqa'
-DEBUG = True
-ALLOWED_HOSTS = []
+# SECRET_KEY = 'django-insecure-@8*)2cpm!w=z$0pi$#+9*&!@1i82-orc=g#(q3*)0iy&rkmuqa'
+# DEBUG = True
+# ALLOWED_HOSTS = []
 
 # render
-# SECRET_KEY = os.environ.get('SECRET_KEY')
-# DEBUG = os.environ.get('DEBUG', 'False') == 'True'
-# ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS").split(",")
+SECRET_KEY = os.environ.get('SECRET_KEY')
+DEBUG = os.environ.get('DEBUG', 'False') == 'True'
+ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS").split(",")
 
 # Application definition
 
