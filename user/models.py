@@ -6,8 +6,8 @@ from django.contrib.auth.models import BaseUserManager
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.dispatch import receiver
 from django.db.models.signals import post_save
-from drf_writable_nested.serializers import WritableNestedModelSerializer
 from .enum import Role
+from cloudinary_storage.storage import MediaCloudinaryStorage
 
 class UserManager(BaseUserManager):
     # def create_user(self, email,password,**extra_fields):
@@ -91,8 +91,8 @@ class Profile(models.Model):
     profile_id = models.AutoField(primary_key=True)  # auto-increment primary key
     user= models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name='profile')  # links to the user model
     headline = models.TextField(blank=True, null=True,max_length=50)
-    profile_picture = models.ImageField(upload_to='profile_pictures/', null=True, blank=True)
-    banner = models.ImageField(upload_to='banner/', null=True, blank=True)
+    profile_picture = models.ImageField(upload_to='profile/',storage=MediaCloudinaryStorage(),null=True,blank=True)
+    banner = models.ImageField(upload_to='banner/', storage = MediaCloudinaryStorage(), null=True, blank=True)
     bio = models.TextField(blank=True, null=True)  # Short biography
     address = models.CharField(max_length=255, blank=True, null=True)  # User's address
     created_at = models.DateTimeField(auto_now_add=True)  # Timestamp when the profile is created
