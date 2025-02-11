@@ -8,19 +8,25 @@ from dotenv import load_dotenv
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-import os
-from google.oauth2 import service_account
-
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
+# Static files configuration
+STATIC_URL = 'static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 # Media
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME':os.environ.get('CLOUDINARY_CLOUD_NAME','dcaqk4wut') ,
+    'API_KEY': os.environ.get('CLOUDINARY_API_KEY','721239442467743'),
+    'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET','Rb2d_akyiO3M8OXzJ4Bwb5jQeCE')
+}
+
+# Set Cloudinary as your default file storage
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+
 
 # LocalHost
-
 # SECRET_KEY = 'django-insecure-@8*)2cpm!w=z$0pi$#+9*&!@1i82-orc=g#(q3*)0iy&rkmuqa'
 # DEBUG = True
 # ALLOWED_HOSTS = []
@@ -31,7 +37,6 @@ DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS").split(",")
 
 # Application definition
-
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -49,13 +54,14 @@ INSTALLED_APPS = [
     # 'contract',
     'corsheaders',
     'rest_framework_simplejwt.token_blacklist',
+    'cloudinary',
+    'cloudinary_storage'
 ]
 
-
+# CORS headers
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000", 
-    "http://localhost:3001"# Your Next.js development server
-    # Add your production frontend URL when deploying
+    "http://localhost:3001"
 ]
 
 CORS_ALLOW_CREDENTIALS = True
@@ -89,8 +95,9 @@ SESSION_COOKIE_SAMESITE = 'None'
 
 
 MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware',  # Move this to the top
+    'corsheaders.middleware.CorsMiddleware', 
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -99,6 +106,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+# Templates
 ROOT_URLCONF = 'service_api.urls'
 TEMPLATES_ROOT = os.path.join(BASE_DIR, "templates")
 TEMPLATES = [
@@ -121,7 +129,6 @@ WSGI_APPLICATION = 'service_api.wsgi.application'
 
 
 # Database
-# https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 DATABASES = {
     'default': {
         'ENGINE': os.environ.get('DB_DRIVER','django.db.backends.postgresql_psycopg2'),
@@ -141,14 +148,9 @@ database_url = os.environ.get('DATABASE_URL')
 
 DATABASES["default"] = dj_database_url.parse(database_url)
 
-
-# Password validation
-# https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
-
-
 AUTH_USER_MODEL = "user.CustomUser"
 
-
+# Password validation
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
@@ -166,8 +168,6 @@ AUTH_PASSWORD_VALIDATORS = [
 
 
 # Internationalization
-# https://docs.djangoproject.com/en/5.1/topics/i18n/
-
 LANGUAGE_CODE = 'en-us'
 
 TIME_ZONE = 'UTC'
@@ -177,17 +177,8 @@ USE_I18N = True
 USE_TZ = True
 
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/5.1/howto/static-files/
-
-STATIC_URL = 'static/'
-
 # Default primary key field type
-# https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
-
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-
 
 
 REST_FRAMEWORK = {
@@ -197,19 +188,19 @@ REST_FRAMEWORK = {
     ],
     'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend']
 }
-
+    
 SIMPLE_JWT = {
     'AUTH_HEADER_TYPES': ('Bearer',),
     'ACCESS_TOKEN_LIFETIME': timedelta(hours=2),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
     'ROTATE_REFRESH_TOKENS': False,
     'BLACKLIST_AFTER_ROTATION': True,
-    'USER_ID_FIELD': 'user_id',  # Add this line
-    'USER_ID_CLAIM': 'user_id',  # Add this line
+    'USER_ID_FIELD': 'user_id',  
+    'USER_ID_CLAIM': 'user_id',  
 }
 
 AUTHENTICATION_BACKENDS = [
-    'django.contrib.auth.backends.ModelBackend',  # Default authentication
+    'django.contrib.auth.backends.ModelBackend',  
 ]
 
 CELERY_BROKER_URL = os.getenv("REDIS_URL", "redis://localhost:6379/0")
@@ -227,3 +218,5 @@ EMAIL_HOST_USER = 'tashiwangchuk619@gmail.com'
 EMAIL_HOST_PASSWORD = 'nmhd phid hbon uxnq'
 HOST_URL='http://127.0.0.1:8000'
 EFAULT_FROM_EMAIL = 'tashiwangchuk619@gmail.com'
+
+
