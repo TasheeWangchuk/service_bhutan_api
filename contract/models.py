@@ -5,6 +5,7 @@ from django.utils import timezone
 from user.models import CustomUser
 from job.models import Job, Proposal
 from .enums import ContractStatus,PaymentStatus
+from cloudinary_storage.storage import MediaCloudinaryStorage
 
 class Contract(models.Model):
     contract_id = models.AutoField(primary_key=True)
@@ -56,7 +57,7 @@ class Payment(models.Model):
         default=PaymentStatus.PENDING
     )
     contract = models.OneToOneField(Contract, on_delete=models.CASCADE, related_name='payment')
-    screenshot = models.ImageField(upload_to='payment_screenshots/')
+    screenshot = models.ImageField(upload_to='payments/',storage=MediaCloudinaryStorage(),null=True,blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
