@@ -150,8 +150,10 @@ class BasicProfileSerializer(WritableNestedModelSerializer):
             'bio',
             'address',
             'headline',
+            'skills',
+            'average_rating'
         )
-        read_only_fields = ('profile_id',)
+        read_only_fields = ('profile_id','average_rating')
         
 
 class PrivateUserProfileSerializer(WritableNestedModelSerializer):
@@ -189,6 +191,7 @@ class DetailProfileSerializer(WritableNestedModelSerializer):
             'bio',
             'address',
             'headline',
+            'skills'
             'portfolios',
             'certificates',
             'experiences',

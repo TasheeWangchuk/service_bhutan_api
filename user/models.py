@@ -8,6 +8,8 @@ from django.dispatch import receiver
 from django.db.models.signals import post_save
 from .enum import Role
 from cloudinary_storage.storage import MediaCloudinaryStorage
+from django.contrib.postgres.fields import ArrayField
+from django.core.validators import MinValueValidator, MaxValueValidator
 
 class UserManager(BaseUserManager):
     # def create_user(self, email,password,**extra_fields):
@@ -95,6 +97,16 @@ class Profile(models.Model):
     banner = models.ImageField(upload_to='banner/', storage = MediaCloudinaryStorage(), null=True, blank=True)
     bio = models.TextField(blank=True, null=True)  # Short biography
     address = models.CharField(max_length=255, blank=True, null=True)  # User's address
+    skills = ArrayField(models.CharField(max_length=100),blank=True,null=True,default=list)
+    average_rating =  average_rating = models.DecimalField(
+        max_digits=3, 
+        decimal_places=2,
+        default=0.00,
+        validators=[
+            MinValueValidator(0),
+            MaxValueValidator(5)
+        ]
+    )
     created_at = models.DateTimeField(auto_now_add=True)  # Timestamp when the profile is created
     updated_at = models.DateTimeField(auto_now=True)  # Timestamp when the profile is updated
 

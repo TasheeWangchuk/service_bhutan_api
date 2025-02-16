@@ -175,7 +175,7 @@ class UserPhotoUploadView(generics.UpdateAPIView):
         profile.profile_picture = photo
         profile.save()
         
-        serializer = BasicProfileSerializer(user)
+        serializer = BasicProfileSerializer(profile)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 class UserBannerUploadView(generics.UpdateAPIView):
@@ -188,18 +188,16 @@ class UserBannerUploadView(generics.UpdateAPIView):
         profile.banner = photo
         profile.save()
         
-        serializer = BasicProfileSerializer(user)
+        serializer = BasicProfileSerializer(profile)
         return Response(serializer.data, status=status.HTTP_200_OK) 
 
 class AdminUserListView(generics.ListAPIView):
     queryset = CustomUser.objects.all()  # This is fine
     serializer_class = PrivateUserProfileSerializer
     permission_classes = [permissions.IsAuthenticated,IsAdministrator]
-    filter_backends = [filters.DjangoFilterBackend, SearchFilter, OrderingFilter]
-    filterset_fields = ['role', 'is_verified', 'is_banned']
-    search_fields = ['username', 'email', 'first_name', 'last_name']
-    ordering_fields = ['created_at', 'username']
-    ordering = ['-created_at']
+    filter_backends = [filters.DjangoFilterBackend, SearchFilter]
+    filterset_fields = ['role']
+    search_fields = ['username']
 
     def get_queryset(self):
         # Filter users who are verified and not banned, and not deleted
@@ -233,7 +231,7 @@ class UserListView(generics.ListAPIView):
     permission_classes = [permissions.IsAuthenticated]
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     filterset_fields = ['role', 'is_banned']
-    search_fields = ['username', 'email', 'first_name', 'last_name']
+    search_fields = ['username']
     ordering_fields = ['created_at', 'username']
     ordering = ['-created_at']
 
