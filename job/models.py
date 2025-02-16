@@ -1,6 +1,6 @@
 from django.db import models
 from user.models import CustomUser
-from .enums import PaymentTypeEnum, TimePreferenceEnum, ExperienceLevelEnum, LocationEnum, StatusEnum, ProposalStatusEnum
+from .enums import PaymentTypeEnum, TimePreferenceEnum, ExperienceLevelEnum, LocationEnum, JobStatusEnum, ProposalStatusEnum
 
 
 class JobCategory(models.Model):
@@ -32,7 +32,7 @@ class Job(models.Model):
     custom_time_preference = models.CharField(max_length=255,null=True,blank=True,help_text="Custom time preference if not selecting from predefined options" )
     experience_level = models.CharField(max_length=20,choices=ExperienceLevelEnum.choices(),)
     location = models.CharField(max_length=20,choices=LocationEnum.choices(),)
-    status = models.CharField(max_length=20,choices=StatusEnum.choices(),default=StatusEnum.OPEN.name)
+    status = models.CharField(max_length=20,choices=JobStatusEnum.choices(),default=JobStatusEnum.OPEN.name)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     skills = models.ManyToManyField('Skill')  
