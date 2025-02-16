@@ -11,7 +11,7 @@ urlpatterns = [
     path("api/v1/", include("user.urls"), name="users"),
     path("api/v1/", include("portfolio.urls"), name="portfolios"),
     path("api/v1/", include("job.urls"), name="jobs"),
-    # path("api/v1/", include("contract.urls"), name="jobs"),
+    path("api/v1/", include("contract.urls"), name="jobs"),
     path("api/v1/", include("notification.urls"), name="notifications"),
     path("", redirect_to_api, name="home"),  # Add this line
 ]
