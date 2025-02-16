@@ -1,8 +1,19 @@
 from rest_framework import serializers
-from .models import Portfolio,Certificate,Education,Experience
+from .models import Portfolio,Certificate,Education,Experience,Service
 from django.utils import timezone
 
-
+class ServiceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Service
+        fields = [
+            'service_id',
+            'profile',
+            'service_title',
+            'created_at',
+            'updated_at'
+        ]
+        read_only_fields = ['profile','service_id']
+       
 class PortfolioSerializer(serializers.ModelSerializer):
     class Meta:
         model = Portfolio
@@ -11,6 +22,7 @@ class PortfolioSerializer(serializers.ModelSerializer):
             'project_title',
             'profile',
             'project_role',
+            'project_picture',
             'project_description',
             'created_at',
             'updated_at'
@@ -29,6 +41,7 @@ class CertificateSerializer(serializers.ModelSerializer):
             'certificate_id',
             'profile',
             'certificate_title',
+            'certificate_picture',
             'certificate_issuer',
             'certificate_file',
             'issue_date',
