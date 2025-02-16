@@ -217,7 +217,7 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'tashiwangchuk619@gmail.com'
 EMAIL_HOST_PASSWORD = 'nmhd phid hbon uxnq'
-HOST_URL='http://127.0.0.1:8000'
-EFAULT_FROM_EMAIL = 'tashiwangchuk619@gmail.com'
+HOST_URL='https://service-bhutan-api-o2oc.onrender.com'
+DEFAULT_FROM_EMAIL = 'tashiwangchuk619@gmail.com'
 
 
