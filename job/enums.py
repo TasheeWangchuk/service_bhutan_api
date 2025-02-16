@@ -40,10 +40,8 @@ class LocationEnum(Enum):
     def choices(cls):
         return [(item.name, item.value) for item in cls]
 
-class StatusEnum(Enum):
+class JobStatusEnum(Enum):
     OPEN = "Open"
-    IN_PROGRESS = "In Progress"
-    COMPLETED = "Completed"
     CLOSED = "Closed"
 
     @classmethod
@@ -52,6 +50,7 @@ class StatusEnum(Enum):
 
 class ProposalStatusEnum(Enum):
     PENDING = 'PENDING'
+    RESUBMITTED = 'RESUBMITTED'
     ACCEPTED = 'ACCEPTED'
     REJECTED = 'REJECTED'
     
