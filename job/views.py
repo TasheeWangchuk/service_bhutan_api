@@ -1,9 +1,11 @@
 from rest_framework import generics, filters, status,viewsets
 from django.shortcuts import get_object_or_404
+from django.http import Http404
 from django.core.exceptions import ValidationError
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework import permissions
+from django.core.exceptions import PermissionDenied
 from rest_framework.permissions import IsAuthenticated
 from django_filters.rest_framework import DjangoFilterBackend
 from django.db import models
@@ -23,6 +25,7 @@ from .helper.notify import (
     notify_job_status_change,
     notify_job_deletion
 )
+from user.enum import Role
 
 class JobListCreateView(generics.ListCreateAPIView):
     permission_classes = [IsAuthenticated]
@@ -42,7 +45,7 @@ class JobListCreateView(generics.ListCreateAPIView):
         queryset = Job.objects.select_related('job_category', 'user').prefetch_related('skills')
        
         # If user is a client, only show their own jobs
-        if user.role == 'Client':  
+        if user.role == Role.CLIENT:  
             return queryset.filter(user=user)
             
         # If user is freelancer or admin, show all jobs
@@ -51,10 +54,14 @@ class JobListCreateView(generics.ListCreateAPIView):
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
 
-class JobRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
-    permission_classes = [IsAuthenticated]
+class JobDetailView(generics.RetrieveUpdateDestroyAPIView):
+    
     serializer_class = JobSerializer
     lookup_field = 'job_id'
+    def get_permissions(self):
+        if self.request.method == 'GET':
+            return [IsAuthenticated()]
+        return [IsAuthenticated(),IsJobOwnerOrAdmin()]
     
     def perform_update(self, serializer):
         old_status = self.get_object().status
@@ -66,8 +73,16 @@ class JobRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
         super().perform_destroy(instance)
          
     def get_queryset(self):
-        return Job.objects.select_related('job_category','user').prefetch_related('skills')
-    
+        user = self.request.user
+        queryset = Job.objects.select_related('job_category','user').prefetch_related('skills')
+        
+        # If user is a client, only show their own jobs
+        if user.role == Role.CLIENT:  
+            return queryset.filter(user=user)
+            
+        # If user is freelancer or admin, show all jobs
+        return queryset
+        
 class JobCategoryViewSet(viewsets.ModelViewSet):
     queryset = JobCategory.objects.all()
     serializer_class = JobCategorySerializer
@@ -99,8 +114,7 @@ class ProposalListCreateView(generics.ListCreateAPIView):
     def get_permissions(self):
         if self.request.method == 'POST':
             return [IsFreelancer()]
-        return [IsAuthenticated()]  # Base permission, we'll filter in get_queryset
-    
+        return [IsAuthenticated(),IsClient()]  # Base permission, we'll filter in get_queryset
     
     def get_queryset(self):
         job_id = self.kwargs.get('job_id')
@@ -123,7 +137,6 @@ class ProposalListCreateView(generics.ListCreateAPIView):
             print(f"No job found with ID: {job_id}")
             return Proposal.objects.none()
         
-    
     def perform_create(self, serializer):
         job_id = self.kwargs.get('job_id')
         job = get_object_or_404(Job, job_id=job_id)
@@ -139,37 +152,21 @@ class ProposalListCreateView(generics.ListCreateAPIView):
         proposal = serializer.save(job=job,user=self.request.user)
         notify_new_proposal(proposal)
         
+
 class ProposalDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Proposal.objects.all()
     serializer_class = ProposalSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [
+        permissions.IsAuthenticated,
+        IsProposalAccessible,
+        CanDeleteProposal
+    ]
     lookup_field = 'proposal_id'
-    
-    def get_object(self):
-        obj = super().get_object()
-        # Only allow access to own proposals or job owner
-        if obj.user != self.request.user and obj.job.user != self.request.user:
-            raise permissions.PermissionDenied(
-                "You don't have permission to access this proposal"
-            )
-        return obj
     
     def perform_update(self, serializer):
         old_status = self.get_object().status
         proposal = serializer.save()
         notify_proposal_status_change(proposal, old_status)
-        
-    def perform_destroy(self, instance):
-        # Only allow deletion if proposal is pending
-        if instance.status != 'PENDING':
-            raise ValidationError(
-                "Cannot delete proposal that is not in pending status"
-            )
-        if instance.user != self.request.user:
-            raise permissions.PermissionDenied(
-                "Only proposal owner can delete the proposal"
-            )
-        instance.delete()
         
 class UserProposalListView(generics.ListAPIView):
     permission_classes = [IsAuthenticated, IsFreelancer]
