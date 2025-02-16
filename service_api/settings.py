@@ -27,14 +27,14 @@ DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
 
 # LocalHost
-# SECRET_KEY = 'django-insecure-@8*)2cpm!w=z$0pi$#+9*&!@1i82-orc=g#(q3*)0iy&rkmuqa'
-# DEBUG = True
-# ALLOWED_HOSTS = []
+SECRET_KEY = 'django-insecure-@8*)2cpm!w=z$0pi$#+9*&!@1i82-orc=g#(q3*)0iy&rkmuqa'
+DEBUG = True
+ALLOWED_HOSTS = []
 
 # render
-SECRET_KEY = os.environ.get('SECRET_KEY')
-DEBUG = os.environ.get('DEBUG', 'False') == 'True'
-ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS").split(",")
+# SECRET_KEY = os.environ.get('SECRET_KEY')
+# DEBUG = os.environ.get('DEBUG', 'False') == 'True'
+# ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS").split(",")
 
 # Application definition
 INSTALLED_APPS = [
@@ -51,7 +51,7 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'notification',
     'portfolio',
-    # 'contract',
+    'contract',
     'corsheaders',
     'rest_framework_simplejwt.token_blacklist',
     'cloudinary',
@@ -141,12 +141,12 @@ DATABASES = {
 }
 
 # """Render database_url variable"""
-database_url = os.environ.get('DATABASE_URL')
+# database_url = os.environ.get('DATABASE_URL')
 
 # """External Database Connection"""
 # database_url ="postgresql://service_bhutan_database_u452_user:EMW9XFgDmJtzNBSihyn4LULhWqpMJT1k@dpg-cukettt6l47c73cas0i0-a.oregon-postgres.render.com/service_bhutan_database_u452"
 
-DATABASES["default"] = dj_database_url.parse(database_url)
+# DATABASES["default"] = dj_database_url.parse(database_url)
 
 AUTH_USER_MODEL = "user.CustomUser"
 
@@ -202,6 +202,7 @@ SIMPLE_JWT = {
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',  
 ]
+
 
 CELERY_BROKER_URL = os.getenv("REDIS_URL", "redis://localhost:6379/0")
 CELERY_RESULT_BACKEND = os.getenv("REDIS_URL", "redis://localhost:6379/0")
