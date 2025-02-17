@@ -1,18 +1,7 @@
 from rest_framework import serializers
-from .models import Portfolio,Certificate,Education,Experience,Service
+from .models import Portfolio,Certificate,Education,Experience
 from django.utils import timezone
 
-class ServiceSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Service
-        fields = [
-            'service_id',
-            'profile',
-            'service_title',
-            'created_at',
-            'updated_at'
-        ]
-        read_only_fields = ['profile','service_id']
        
 class PortfolioSerializer(serializers.ModelSerializer):
     class Meta:

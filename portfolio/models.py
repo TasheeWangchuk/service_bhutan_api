@@ -3,15 +3,6 @@ from django.conf import settings
 from user.models import Profile
 from cloudinary_storage.storage import MediaCloudinaryStorage
 
-class Service(models.Model):
-    service_id = models.AutoField(primary_key=True)
-    profile = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='services')
-    service_title = models.CharField(max_length=255)
-    created_at = models.DateTimeField(blank=True, null=True)
-    updated_at = models.DateTimeField(blank=True, null=True)
-    class Meta:
-        managed = True
-        db_table = 'services'
     
 class Portfolio(models.Model):
     portfolio_id = models.AutoField(primary_key=True)
