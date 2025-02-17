@@ -129,40 +129,79 @@ class LogoutView(APIView):
         except Exception:
             return Response({"error": "Invalid token"}, status=status.HTTP_400_BAD_REQUEST)
 
+# class ProfileView(generics.RetrieveUpdateAPIView):
+#     permission_classes = [permissions.IsAuthenticated]
+#     serializer_class = PrivateUserProfileSerializer
+    
+#     def get_object(self):
+#         user = self.request.user
+#         # Create profile if it doesn't exist
+#         if not hasattr(user, 'profile'):
+#             Profile.objects.create(user=user)
+#         return user
+    
+#     def update(self, request, *args, **kwargs):
+#         user = self.get_object()
+#         profile_data = request.data.pop('profile', {})
+        
+#         # Update user data
+#         user_serializer = self.get_serializer(user, data=request.data, partial=True)
+#         user_serializer.is_valid(raise_exception=True)
+#         user_serializer.save()
+        
+#         # Update or create profile
+#         if not hasattr(user, 'profile'):
+#             Profile.objects.create(user=user)
+            
+#         if profile_data:
+#             profile_serializer = PrivateUserProfileSerializer(
+#                 user.profile, 
+#                 data=profile_data, 
+#                 partial=True
+#             )
+#             profile_serializer.is_valid(raise_exception=True)
+#             profile_serializer.save()
+        
+#         return Response(user_serializer.data)
+
+# views.py
+from rest_framework import generics, status
+from rest_framework.response import Response
+from .permissions import IsProfileOwner
+from .services import ProfileService
+from .serializers import PrivateUserProfileSerializer
+
 class ProfileView(generics.RetrieveUpdateAPIView):
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [IsProfileOwner]
     serializer_class = PrivateUserProfileSerializer
     
     def get_object(self):
         user = self.request.user
-        # Create profile if it doesn't exist
-        if not hasattr(user, 'profile'):
-            Profile.objects.create(user=user)
+        # Create profile if it doesn't exist using service
+        ProfileService.get_or_create_profile(user)
         return user
     
     def update(self, request, *args, **kwargs):
         user = self.get_object()
-        profile_data = request.data.pop('profile', {})
+        
+        # Extract profile data from request
+        if 'profile' in request.data:
+            profile_data = request.data.pop('profile')
+        else:
+            profile_data = {}
         
         # Update user data
         user_serializer = self.get_serializer(user, data=request.data, partial=True)
         user_serializer.is_valid(raise_exception=True)
-        user_serializer.save()
         
-        # Update or create profile
-        if not hasattr(user, 'profile'):
-            Profile.objects.create(user=user)
-            
-        if profile_data:
-            profile_serializer = PrivateUserProfileSerializer(
-                user.profile, 
-                data=profile_data, 
-                partial=True
-            )
-            profile_serializer.is_valid(raise_exception=True)
-            profile_serializer.save()
+        # Use service to update both user and profile
+        updated_data = ProfileService.update_user_and_profile(
+            user,
+            user_serializer,
+            profile_data
+        )
         
-        return Response(user_serializer.data)
+        return Response(updated_data, status=status.HTTP_200_OK)
     
 class UserPhotoUploadView(generics.UpdateAPIView):
     permission_classes = [permissions.IsAuthenticated]
