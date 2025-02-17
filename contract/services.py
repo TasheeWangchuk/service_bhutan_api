@@ -113,8 +113,25 @@ class ContractService:
         contract.job.status = JobStatusEnum.OPEN.name
         contract.job.save()
         
+        #get the current proposals associated with this contract
+        current_proposal = Proposal.objects.get(
+            job = contract.job,
+            user = contract.freelancer
+        )
+        
+        # Update all other proposals for this job back to pending
+        Proposal.objects.filter(
+            job=contract.job
+        ).exclude(
+            proposal_id=current_proposal.proposal_id
+        ).update(status=ProposalStatusEnum.PENDING.name)
+        
+        # Set the current proposal to rejected
+        current_proposal.status = ProposalStatusEnum.REJECTED.name
+        current_proposal.save()
+    
         # Update contract status
-        contract.status = ContractStatus.REJECTED
+        contract.status = ContractStatus.REJECTED.name
         contract.save()
     @staticmethod
     @transaction.atomic
