@@ -114,6 +114,7 @@ class ProposalSerializer(serializers.ModelSerializer):
     skills_details = SkillSerializer(source='skills', many=True, read_only=True)
     job_title = serializers.SerializerMethodField(read_only=True)
     created_at = serializers.DateTimeField(read_only=True, format="%Y-%m-%d %H:%M:%S")
+    user = UserMinimalSerializer(read_only=True)
     
     class Meta:
         model = Proposal

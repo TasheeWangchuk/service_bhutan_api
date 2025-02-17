@@ -32,7 +32,6 @@ from .models import CustomUser, PasswordReset
 from .mailers import send_verification_email, request_password_reset, send_admin_created_email
 
 
-
 class SignUp(GenericAPIView):
     serializer_class = UserRegistrationSerializer
     
@@ -228,7 +227,7 @@ class UserBannedListView(generics.ListAPIView):
 class UserListView(generics.ListAPIView):
     queryset = CustomUser.objects.all()  # This is fine
     serializer_class = PrivateUserProfileSerializer
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.IsAuthenticated]
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     filterset_fields = ['role', 'is_banned']
     search_fields = ['username']
@@ -243,6 +242,33 @@ class UserListView(generics.ListAPIView):
             deleted_at__isnull=True,
             role__in=['Freelancer', 'Client']  # Include only Freelancer and Client roles
         ).exclude(user_id= self.request.user.user_id)
+
+# from rest_framework import generics, permissions
+# from django_filters.rest_framework import DjangoFilterBackend
+# from rest_framework.filters import SearchFilter, OrderingFilter
+
+# class UserListView(generics.ListAPIView):
+#     serializer_class = PrivateUserProfileSerializer
+#     permission_classes = [permissions.AllowAny]  # Allow any user to access
+#     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+#     filterset_fields = ['role', 'is_banned']
+#     search_fields = ['username']
+#     ordering_fields = ['created_at', 'username']
+#     ordering = ['-created_at']
+
+#     def get_queryset(self):
+#         queryset = CustomUser.objects.filter(
+#             is_verified=True,
+#             is_banned=False,
+#             deleted_at__isnull=True,
+#             role__in=['Freelancer', 'Client']
+#         )
+        
+#         # Only exclude the current user if they're authenticated
+#         if self.request.user.is_authenticated:
+#             queryset = queryset.exclude(user_id=self.request.user.user_id)
+            
+#         return queryset
 
 class UserDetailView(generics.RetrieveAPIView):
     queryset = CustomUser.objects.all()
