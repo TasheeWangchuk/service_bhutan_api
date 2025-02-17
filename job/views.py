@@ -106,10 +106,11 @@ class SkillViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
 class ProposalListCreateView(generics.ListCreateAPIView):
-    def get_serializer_class(self):
-        if self.request.method == 'POST':
-            return ProposalSerializer
-        return ProposalListSerializer 
+    serializer_class = ProposalSerializer
+    # def get_serializer_class(self):
+    #     if self.request.method == 'POST':
+    #         return ProposalSerializer
+    #     return ProposalListSerializer 
     
     def get_permissions(self):
         if self.request.method == 'POST':
