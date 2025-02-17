@@ -228,7 +228,7 @@ class UserBannedListView(generics.ListAPIView):
 class UserListView(generics.ListAPIView):
     queryset = CustomUser.objects.all()  # This is fine
     serializer_class = PrivateUserProfileSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.AllowAny]
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     filterset_fields = ['role', 'is_banned']
     search_fields = ['username']
