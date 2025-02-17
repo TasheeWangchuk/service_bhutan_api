@@ -139,92 +139,57 @@ class UserLoginSerializer(serializers.Serializer):
             raise serializers.ValidationError('Please verify your email first')
         return data
 
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CustomUser
+        fields = ['username', 'email', 'first_name', 'last_name', 'phone']
 
-class BasicProfileSerializer(WritableNestedModelSerializer):
+class ListProfileSerializer(serializers.ModelSerializer):
+    user = UserSerializer(read_only=True)
+    
     class Meta:
         model = Profile
-        fields = (
+        fields = [
             'profile_id',
+            'user',
+            'headline',
             'profile_picture',
             'banner',
             'bio',
             'address',
-            'headline',
             'skills',
-            'average_rating'
-        )
-        read_only_fields = ('profile_id','average_rating')
-        
+            'average_rating',
+            'created_at',
+            'updated_at'
+        ]
+        read_only_fields = ['profile_id', 'average_rating', 'created_at', 'updated_at','profile_picture',
+            'banner',]
 
-class PrivateUserProfileSerializer(WritableNestedModelSerializer):
-    profile = BasicProfileSerializer(required=True)
+class RetrieveProfileSerializer(serializers.ModelSerializer):
+    user = UserSerializer(read_only=True)
+    portfolios = PortfolioSerializer(many=True, read_only=True)
+    education = EducationSerializer(many=True, read_only=True)
+    experiences = ExperienceSerializer(many=True, read_only=True)
+    certificates = CertificateSerializer(many=True, read_only=True)
     
     class Meta:
-        model = CustomUser
-        fields = (
-            'user_id',
-            'username',
-            'email',
-            'first_name',
-            'last_name', 
-            'phone',
-            'role',
-            'profile',
-        )
-        read_only_fields = ('user_id', 'email', 'role')
+        model = Profile
+        fields = [
+            'profile_id', 'user', 'headline', 'profile_picture', 'banner', 'bio',
+            'address', 'skills', 'average_rating', 'portfolios', 'education',
+            'experiences', 'certificates', 'created_at', 'updated_at'
+        ]
+        read_only_fields = ['profile_id', 'average_rating', 'created_at', 'updated_at']
 
-
-class DetailProfileSerializer(WritableNestedModelSerializer):
-    portfolios = PortfolioSerializer(many=True, required=False, allow_null=True)
-    certificates = CertificateSerializer(many=True, required=False, allow_null=True)
-    education = EducationSerializer(many=True, required=False, allow_null=True)
-    experiences = ExperienceSerializer(many=True, required=False, allow_null=True)
-   
-   
-
+class ProfilePictureSerializer(serializers.ModelSerializer):
     class Meta:
         model = Profile
-        fields = (
-            'profile_id',
-            'profile_picture',
-            'banner',
-            'bio',
-            'address',
-            'headline',
-            'skills',
-            'portfolios',
-            'certificates',
-            'experiences',
-            'education',
-        )
-        read_only_fields = ('profile_id',)
+        fields = ['profile_picture']
 
-
-class PublicUserProfileSerializer(WritableNestedModelSerializer):
-    profile = DetailProfileSerializer(required=True)
-    
-    class Meta:
-        model = CustomUser
-        fields = (
-            'user_id',
-            'username',
-            'email',
-            'first_name',
-            'last_name', 
-            'phone',
-            'role',
-            'profile',
-        )
-        read_only_fields = ('user_id', 'email', 'role')
-
-
-class ProfilePhotoSerializer(serializers.ModelSerializer):
-    photo = ImageField(required=False)
-
+class BannerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Profile
-        fields = ["profile_picture"]
-
+        fields = ['banner']
 
 class UserMinimalSerializer(serializers.ModelSerializer):
     profile_picture = serializers.CharField(source='profile.profile_picture', read_only=True)

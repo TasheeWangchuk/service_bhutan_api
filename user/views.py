@@ -129,79 +129,35 @@ class LogoutView(APIView):
         except Exception:
             return Response({"error": "Invalid token"}, status=status.HTTP_400_BAD_REQUEST)
 
-# class ProfileView(generics.RetrieveUpdateAPIView):
-#     permission_classes = [permissions.IsAuthenticated]
-#     serializer_class = PrivateUserProfileSerializer
-    
-#     def get_object(self):
-#         user = self.request.user
-#         # Create profile if it doesn't exist
-#         if not hasattr(user, 'profile'):
-#             Profile.objects.create(user=user)
-#         return user
-    
-#     def update(self, request, *args, **kwargs):
-#         user = self.get_object()
-#         profile_data = request.data.pop('profile', {})
-        
-#         # Update user data
-#         user_serializer = self.get_serializer(user, data=request.data, partial=True)
-#         user_serializer.is_valid(raise_exception=True)
-#         user_serializer.save()
-        
-#         # Update or create profile
-#         if not hasattr(user, 'profile'):
-#             Profile.objects.create(user=user)
-            
-#         if profile_data:
-#             profile_serializer = PrivateUserProfileSerializer(
-#                 user.profile, 
-#                 data=profile_data, 
-#                 partial=True
-#             )
-#             profile_serializer.is_valid(raise_exception=True)
-#             profile_serializer.save()
-        
-#         return Response(user_serializer.data)
 
-# views.py
 from rest_framework import generics, status
 from rest_framework.response import Response
 from .permissions import IsProfileOwner
-from .services import ProfileService
-from .serializers import PrivateUserProfileSerializer
+from .serializers import ListProfileSerializer
 
 class ProfileView(generics.RetrieveUpdateAPIView):
     permission_classes = [IsProfileOwner]
-    serializer_class = PrivateUserProfileSerializer
+    serializer_class = ListProfileSerializer
     
     def get_object(self):
         user = self.request.user
-        # Create profile if it doesn't exist using service
-        ProfileService.get_or_create_profile(user)
-        return user
+        profile, _ = Profile.objects.get_or_create(user=user)
+        return profile
+    
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context['is_owner'] = True  # Since this view is for the user's own profile
+        return context
     
     def update(self, request, *args, **kwargs):
-        user = self.get_object()
+        profile = self.get_object()
         
-        # Extract profile data from request
-        if 'profile' in request.data:
-            profile_data = request.data.pop('profile')
-        else:
-            profile_data = {}
+        # Update profile directly
+        serializer = self.get_serializer(profile, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
         
-        # Update user data
-        user_serializer = self.get_serializer(user, data=request.data, partial=True)
-        user_serializer.is_valid(raise_exception=True)
-        
-        # Use service to update both user and profile
-        updated_data = ProfileService.update_user_and_profile(
-            user,
-            user_serializer,
-            profile_data
-        )
-        
-        return Response(updated_data, status=status.HTTP_200_OK)
+        return Response(serializer.data)
     
 class UserPhotoUploadView(generics.UpdateAPIView):
     permission_classes = [permissions.IsAuthenticated]
@@ -213,7 +169,7 @@ class UserPhotoUploadView(generics.UpdateAPIView):
         profile.profile_picture = photo
         profile.save()
         
-        serializer = BasicProfileSerializer(profile)
+        serializer = ProfilePictureSerializer(profile)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 class UserBannerUploadView(generics.UpdateAPIView):
@@ -226,12 +182,12 @@ class UserBannerUploadView(generics.UpdateAPIView):
         profile.banner = photo
         profile.save()
         
-        serializer = BasicProfileSerializer(profile)
+        serializer = BannerSerializer(profile)
         return Response(serializer.data, status=status.HTTP_200_OK) 
 
 class AdminUserListView(generics.ListAPIView):
     queryset = CustomUser.objects.all()  # This is fine
-    serializer_class = PrivateUserProfileSerializer
+    serializer_class = ListProfileSerializer
     permission_classes = [permissions.IsAuthenticated,IsAdministrator]
     filter_backends = [filters.DjangoFilterBackend, SearchFilter]
     filterset_fields = ['role']
@@ -247,7 +203,7 @@ class AdminUserListView(generics.ListAPIView):
 
 class UserBannedListView(generics.ListAPIView):
     queryset = CustomUser.objects.all()  # This is fine
-    serializer_class = PrivateUserProfileSerializer
+    serializer_class = ListProfileSerializer
     permission_classes = [permissions.IsAuthenticated,IsAdministrator]
     filter_backends = [filters.DjangoFilterBackend, SearchFilter, OrderingFilter]
     filterset_fields = ['role', 'is_verified', 'is_banned']
@@ -263,56 +219,43 @@ class UserBannedListView(generics.ListAPIView):
             deleted_at__isnull=True
         )
 
+from rest_framework import generics
+from rest_framework.permissions import IsAuthenticated
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.filters import SearchFilter, OrderingFilter
+
 class UserListView(generics.ListAPIView):
-    queryset = CustomUser.objects.all()  # This is fine
-    serializer_class = PrivateUserProfileSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    # Ensure this matches what get_queryset returns
+    serializer_class = ListProfileSerializer
+    
+    # Permissions and filters setup
+    permission_classes = [IsAuthenticated]
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
-    filterset_fields = ['role', 'is_banned']
-    search_fields = ['username']
-    ordering_fields = ['created_at', 'username']
+    
+    # These fields should match fields available in Profile model if applicable
+    filterset_fields = ['user__role', 'user__is_banned']  # Adjust based on actual model fields
+    
+    search_fields = ['user__username']  # Assuming username is part of CustomUser model
+    
+    ordering_fields = ['created_at', 'user__username']  # Adjust field names as needed
+    
     ordering = ['-created_at']
 
     def get_queryset(self):
-        # Filter users who are verified, not banned, not deleted, and have role Freelancer or Client
-        return CustomUser.objects.filter(
-            is_verified=True,
-            is_banned=False,
-            deleted_at__isnull=True,
-            role__in=['Freelancer', 'Client']  # Include only Freelancer and Client roles
-        ).exclude(user_id= self.request.user.user_id)
+        return Profile.objects.filter(
+            user__is_verified=True,
+            user__is_banned=False,
+            user__deleted_at__isnull=True,
+            user__role__in=['Freelancer', 'Client']
+        ).exclude(user=self.request.user)
 
-# from rest_framework import generics, permissions
-# from django_filters.rest_framework import DjangoFilterBackend
-# from rest_framework.filters import SearchFilter, OrderingFilter
-
-# class UserListView(generics.ListAPIView):
-#     serializer_class = PrivateUserProfileSerializer
-#     permission_classes = [permissions.AllowAny]  # Allow any user to access
-#     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
-#     filterset_fields = ['role', 'is_banned']
-#     search_fields = ['username']
-#     ordering_fields = ['created_at', 'username']
-#     ordering = ['-created_at']
-
-#     def get_queryset(self):
-#         queryset = CustomUser.objects.filter(
-#             is_verified=True,
-#             is_banned=False,
-#             deleted_at__isnull=True,
-#             role__in=['Freelancer', 'Client']
-#         )
-        
-#         # Only exclude the current user if they're authenticated
-#         if self.request.user.is_authenticated:
-#             queryset = queryset.exclude(user_id=self.request.user.user_id)
-            
-#         return queryset
 
 class UserDetailView(generics.RetrieveAPIView):
-    queryset = CustomUser.objects.all()
-    lookup_field = "user_id"
-    serializer_class = PublicUserProfileSerializer
+    permission_classes = [IsAuthenticated]
+    serializer_class = RetrieveProfileSerializer
+    def get_object(self):
+        user_id = self.kwargs.get('user_id')
+        return get_object_or_404(Profile, user_id=user_id)
 
 class UserBanView(APIView):
     permission_classes = [permissions.IsAuthenticated,IsAdministrator]
