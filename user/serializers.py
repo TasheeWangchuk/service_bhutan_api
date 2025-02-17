@@ -191,7 +191,7 @@ class DetailProfileSerializer(WritableNestedModelSerializer):
             'bio',
             'address',
             'headline',
-            'skills'
+            'skills',
             'portfolios',
             'certificates',
             'experiences',
