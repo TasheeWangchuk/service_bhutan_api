@@ -1,6 +1,6 @@
 from rest_framework import generics, permissions
 from .models import Notification
-from .serializers import NotificationSerializer
+from .serializers import NotificationSerializer,NotificationMarkSerializer
 from .permissions import IsNotificationOwner
 
 # Add these new views
@@ -12,7 +12,7 @@ class NotificationListView(generics.ListAPIView):
         return Notification.objects.filter(user=self.request.user)
 
 class NotificationMarkAsRead(generics.UpdateAPIView):
-    serializer_class = NotificationSerializer
+    serializer_class = NotificationMarkSerializer
     permission_classes = [permissions.IsAuthenticated,IsNotificationOwner]
     queryset = Notification.objects.all()
     lookup_field = 'notification_id'
