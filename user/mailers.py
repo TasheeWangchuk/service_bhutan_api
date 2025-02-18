@@ -16,7 +16,7 @@ def request_password_reset(token, user_id):
    try:
         user = get_object_or_404(CustomUser, pk=user_id)
         # url = f"{os.getenv('HOST_URL', '')}/auth/password?reset_password_token={token}"
-        url = f"http://127.0.0.1:8000/auth/password?reset_password_token={token}"
+        url = f"{os.getenv('HOST_URL')}/auth/password?reset_password_token={token}"
         print("usrl", url)
         html_content = render_to_string(
             "mailers/user/request_password_reset.html",
