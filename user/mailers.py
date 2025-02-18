@@ -13,31 +13,37 @@ logger = logging.getLogger(__name__)
 
 @app.task
 def request_password_reset(token, user_id):
-   try:
+    try:
         user = get_object_or_404(CustomUser, pk=user_id)
-        # url = f"{os.getenv('HOST_URL', '')}/auth/password?reset_password_token={token}"
-        url = f"{os.getenv('HOST_URL')}/auth/password?reset_password_token={token}"
-        print("usrl", url)
+        url = f"{os.getenv('HOST_URL', '')}/auth/password?reset_password_token={token}"
+        
+        logger.info(f"Attempting to send reset email to {user.email}")
+        logger.info(f"Using HOST_URL: {os.getenv('HOST_URL', '')}")
+        
         html_content = render_to_string(
             "mailers/user/request_password_reset.html",
             {"name": user.username, "url": url},
         )
         
-        # Plain text message
         plain_message = f"Reset your password by visiting: {url}"
         
-        # Send email
         send_mail(
             subject="Reset password instructions",
             message=plain_message,
             from_email=settings.DEFAULT_FROM_EMAIL,
             recipient_list=[user.email],
-            html_message=html_content
+            html_message=html_content,
+            fail_silently=False  # Add this to raise errors
         )
-        logger.info(f"Password reset email sent to {user.email}")
-   except Exception as e:
-       logger.error(f"Error in password reset email: {e}")
-       raise
+        logger.info(f"Password reset email sent successfully to {user.email}")
+        
+    except CustomUser.DoesNotExist:
+        logger.error(f"User with id {user_id} not found")
+        raise
+    except Exception as e:
+        logger.error(f"Error in password reset email: {str(e)}")
+        logger.error(f"Email settings: HOST={os.getenv('EMAIL_HOST')}, PORT={os.getenv('EMAIL_PORT')}, FROM={settings.DEFAULT_FROM_EMAIL}")
+        raise
         
 
 @app.task
