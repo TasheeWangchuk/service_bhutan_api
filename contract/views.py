@@ -1,5 +1,5 @@
 from rest_framework import generics, permissions, status
-from .permissions import *
+from service_api.helper.permissions import *
 from rest_framework.response import Response
 from rest_framework.exceptions import ValidationError
 from django.db import transaction
@@ -31,9 +31,7 @@ from rest_framework.views import APIView
 from django.shortcuts import get_object_or_404
 from .models import Payment, Contract
 from .serializers import PaymentSerializer,ReviewSerializer
-from .permissions import (CanCreateContract, ContractAccessPermission,
-                          IsAssignedFreelancer,CanManageContractPayment,
-                          CanVerifyPayment,CanCreateContractReview)
+from service_api.helper.permissions import *
 from .services import ProposalService,ContractService,PaymentService, ReviewService
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import OrderingFilter
