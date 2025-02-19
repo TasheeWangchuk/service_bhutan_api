@@ -9,6 +9,7 @@ load_dotenv()
 # # set the default Django settings module for the 'celery' program.
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "service_api.settings")
 
+
 app = Celery(
     "service_api",
     broker=os.getenv("REDIS_URL", "redis://localhost:6379/0"),
