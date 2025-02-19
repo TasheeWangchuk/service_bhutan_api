@@ -1,11 +1,11 @@
-from rest_framework import serializers
-from .models import Contract,Milestone
-from job.models import Proposal
-from django.utils import timezone
-
-from rest_framework import serializers
-from .models import Contract, Milestone
+from django.core.exceptions import ValidationError
 from django.db import transaction
+from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
+from rest_framework import serializers
+from .models import Contract, Milestone, Payment, Review
+from .enums import ContractStatus
+from job.models import Proposal
 from user.serializers import UserMinimalSerializer
 
 class MilestoneSerializer(serializers.ModelSerializer):
@@ -119,12 +119,6 @@ class ContractCompletedSerializer(serializers.ModelSerializer):
         fields = ['status']
         extra_kwargs = {'status': {'required': True}}
 
-from rest_framework import serializers
-from .models import Payment, Review, Contract
-from user.serializers import UserMinimalSerializer
-from django.core.exceptions import ValidationError
-from django.utils import timezone
-
 class PaymentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Payment
@@ -147,12 +141,6 @@ class PaymentSerializer(serializers.ModelSerializer):
                 })
         return data
         
-# review/serializers.py
-from rest_framework import serializers
-from django.utils.translation import gettext_lazy as _
-from .models import Review
-from .enums import ContractStatus
-
 class ReviewSerializer(serializers.ModelSerializer):
     client_name = serializers.CharField(source='client.username', read_only=True)
     freelancer_name = serializers.CharField(source='freelancer.username', read_only=True)
