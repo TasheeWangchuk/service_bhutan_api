@@ -1,11 +1,14 @@
 from django.db import models
 from user.models import CustomUser
 from .enums import PaymentTypeEnum, TimePreferenceEnum, ExperienceLevelEnum, LocationEnum, JobStatusEnum, ProposalStatusEnum
+from cloudinary_storage.storage import MediaCloudinaryStorage
 
 
 class JobCategory(models.Model):
     category_id = models.AutoField(primary_key=True)
     category_name = models.CharField(max_length=255)
+    category_picture = models.ImageField(upload_to='certificate_picture/', storage=MediaCloudinaryStorage, blank=True, null=True)
+
 
     class Meta:
         managed = True

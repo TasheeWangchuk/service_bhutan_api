@@ -7,7 +7,7 @@ from django.utils import timezone
 class JobCategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = JobCategory
-        fields = ('category_id', 'category_name')
+        fields = ('category_id', 'category_name','category_picture')
 
 class SkillSerializer(serializers.ModelSerializer):
     class Meta:
