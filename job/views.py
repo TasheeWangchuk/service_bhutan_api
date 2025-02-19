@@ -18,7 +18,7 @@ from .serializers import (
     ProposalListSerializer,
     JobListSerializer
 )
-from .permissions import *
+from service_api.helper.permissions import *
 from .helper.notify import (
     notify_new_proposal,
     notify_proposal_status_change,
