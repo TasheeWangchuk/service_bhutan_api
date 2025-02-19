@@ -309,22 +309,17 @@ class PasswordResetSerializer(serializers.Serializer):
 
 
 class AdminUserCreateSerializer(serializers.ModelSerializer):
-    # class Meta:
-    #     model = CustomUser
-    #     fields = ['email', 'username', 'role', 'first_name', 'last_name']
-    #     extra_kwargs = {
-    #         'password': {'write_only': True, 'required': False}
-    #     }
-
-    # def create(self, validated_data):
-    #     user = CustomUser.objects.create_user(**validated_data)
-    #     user.set_unusable_password()
-    #     user.is_verified = False
-    #     user.save()
-    #     return user
+   
     class Meta:
         model = CustomUser
-        fields = ["email", "username", "role", "first_name", "last_name"]
+        fields = [
+            "email",
+            "username",
+            "role",
+            "first_name",
+            "last_name"
+            ]
+        
         extra_kwargs = {
             "password": {"write_only": True, "required": False, "allow_null": True}
         }

@@ -27,7 +27,7 @@ from django_filters import rest_framework as filters
 from rest_framework.filters import SearchFilter, OrderingFilter
 
 from .serializers import *
-from .permissions import IsClient, IsFreelancer, IsAdministrator
+from service_api.helper.permissions import *
 from .models import CustomUser, PasswordReset
 from .mailers import send_verification_email, request_password_reset, send_admin_created_email
 
@@ -132,7 +132,7 @@ class LogoutView(APIView):
 
 from rest_framework import generics, status
 from rest_framework.response import Response
-from .permissions import IsProfileOwner
+from service_api.helper.permissions import IsProfileOwner
 from .serializers import ListProfileSerializer
 
 class ProfileView(generics.RetrieveUpdateAPIView):
@@ -204,7 +204,7 @@ class AdminUserListView(generics.ListAPIView):
 class UserBannedListView(generics.ListAPIView):
     queryset = CustomUser.objects.all()  # This is fine
     serializer_class = ListProfileSerializer
-    permission_classes = [permissions.IsAuthenticated,IsAdministrator]
+    permission_classes = [permissions.IsAuthenticated, IsAdministrator]
     filter_backends = [filters.DjangoFilterBackend, SearchFilter, OrderingFilter]
     filterset_fields = ['role', 'is_verified', 'is_banned']
     search_fields = ['username', 'email', 'first_name', 'last_name']
@@ -302,13 +302,13 @@ class ChangePasswordView(APIView):
         return Response(serializer_class.errors, status=status.HTTP_400_BAD_REQUEST)
     
 class RequestPasswordReset(generics.GenericAPIView):
-    
     serializer_class = PasswordResetRequestSerializer
     
-    def post(self,request):
+    def post(self, request):
         serializer = self.serializer_class(data=request.data)
         if not serializer.is_valid():
             raise exceptions.ValidationError(serializer.errors)
+            
         email = request.data["email"]
         user = CustomUser.objects.filter(email__iexact=email).first()
         
@@ -317,11 +317,17 @@ class RequestPasswordReset(generics.GenericAPIView):
             token = token_generator.make_token(user)
             reset = PasswordReset(email=email, token=token)
             reset.save()
-            request_password_reset.delay(token, user.user_id)
-            return Response({"success":"We have sent you a link to reset your password. "}, status=status.HTTP_200_OK)
+            # Change user.user_id to user.id or user.pk
+            request_password_reset.delay(token, user.user_id)  # or user.pk
+            return Response(
+                {"success": "We have sent you a link to reset your password."}, 
+                status=status.HTTP_200_OK
+            )
         
-        else:
-            return Response({"error": "User with the given email is not found."}, status=status.HTTP_404_NOT_FOUND)
+        return Response(
+            {"error": "User with the given email is not found."}, 
+            status=status.HTTP_404_NOT_FOUND
+        )
 
 class ResetPassword(generics.GenericAPIView):
     serializer_class = PasswordResetSerializer
