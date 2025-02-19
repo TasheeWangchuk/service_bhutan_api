@@ -10,7 +10,6 @@ class PortfolioSerializer(serializers.ModelSerializer):
             'portfolio_id',
             'project_title',
             'profile',
-            'project_role',
             'project_picture',
             'project_description',
             'created_at',
@@ -32,7 +31,6 @@ class CertificateSerializer(serializers.ModelSerializer):
             'certificate_title',
             'certificate_picture',
             'certificate_issuer',
-            'certificate_file',
             'issue_date',
             'created_at',
             'updated_at'
