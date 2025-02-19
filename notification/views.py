@@ -1,8 +1,7 @@
 from rest_framework import generics, permissions
 from .models import Notification
 from .serializers import NotificationSerializer,NotificationMarkSerializer
-from .permissions import IsNotificationOwner
-
+from service_api.helper.permissions import *
 # Add these new views
 class NotificationListView(generics.ListAPIView):
     serializer_class = NotificationSerializer
